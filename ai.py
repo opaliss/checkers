@@ -22,6 +22,7 @@ class AlphaBetaSearch:
         # the maximum number of depth. until we terminate search.
         self.maxplies = maxplies
         # if set to verbose is True -> print results.
+        self.verbose = verbose
 
     def alphabeta(self, state):
         """
@@ -36,6 +37,13 @@ class AlphaBetaSearch:
         return action in actions(state) with value v
         """
         v, best_action = self.maxvalue(state=state, alpha=-math.inf, beta=math.inf, ply=0)
+        if best_action is None:
+            if len(state.get_actions(player=self.maxplayer)) != 0:
+                self.maxplies += -1
+                v, best_action = self.maxvalue(state=state, alpha=-math.inf, beta=math.inf, ply=0)
+            else:
+                print("game is over, winner = ", self.minplayer)
+
         return best_action
 
     def cutoff(self, state, ply):
@@ -52,7 +60,10 @@ class AlphaBetaSearch:
         # TODO: check if state is an object of checkerboard class.
         terminal, winner = state.is_terminal()
 
-        if ply <= self.maxplies and terminal is False:
+        if terminal:
+            print(" ***** game over ******, winner = ", winner)
+
+        if ply <= self.maxplies and terminal is False and len(state.get_actions(player=self.maxplayer)) != 0:
             return False
 
         else:
@@ -132,7 +143,10 @@ class Strategy(abstractstrategy.Strategy):
         """
 
         best_action = self.search.alphabeta(state=board)
-        return board.move(move=best_action), best_action
+        if best_action is None:
+            return board, None
+        else:
+            return board.move(move=best_action), best_action
 
     def evaluate(self, state, turn=None):
         """
