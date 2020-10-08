@@ -1,3 +1,12 @@
+"""
+Single Programmer Affidavit
+I the undersigned promise that the attached assignment is my own work. While I was free to discuss ideas with others,
+the work contained is my own. I recognize that should this not be the case, I will be subject to penalties as outlined
+in the course syllabus.
+
+Programmer: Opal Issan: Oct, 2020.
+"""
+
 from lib import abstractstrategy, boardlibrary
 import math
 
@@ -29,21 +38,8 @@ class AlphaBetaSearch:
         Conduct an alpha beta pruning search from state
         :param state: Instance of the game representation
         :return: best action for maxplayer
-
-
-        pseudopod:
-        alpha-beta search(state)
-        v = maxvalue(state, α=-∞, β=∞)
-        return action in actions(state) with value v
         """
         v, best_action = self.maxvalue(state=state, alpha=-math.inf, beta=math.inf, ply=0)
-        if best_action is None:
-            if len(state.get_actions(player=self.maxplayer)) != 0:
-                self.maxplies += -1
-                v, best_action = self.maxvalue(state=state, alpha=-math.inf, beta=math.inf, ply=0)
-            else:
-                print("game is over, winner = ", self.minplayer)
-
         return best_action
 
     def cutoff(self, state, ply):
@@ -57,17 +53,22 @@ class AlphaBetaSearch:
         # check if the game is over or if we went above max_depth
         """
         # check if game is over, aka player moves list is zero or it has zero players.
-        # TODO: check if state is an object of checkerboard class.
         terminal, winner = state.is_terminal()
 
-        if terminal:
-            print(" ***** game over ******, winner = ", winner)
-
-        if ply <= self.maxplies and terminal is False and len(state.get_actions(player=self.maxplayer)) != 0:
-            return False
-
-        else:
+        # if the search depth is greater than maxplies, than stop search.
+        if ply > self.maxplies:
             return True
+
+        # if the game is over return stop search.
+        elif terminal:
+            return True
+
+        # if the max player can not move, stop search.
+        elif len(state.get_actions(player=self.maxplayer)) == 0:
+            return True
+
+        # otherwise, return continue to search.
+        return False
 
     def maxvalue(self, state, alpha, beta, ply):
         """
@@ -86,8 +87,9 @@ class AlphaBetaSearch:
         else:
             v = -math.inf
             for a in state.get_actions(player=self.maxplayer):
-                if self.minvalue(state=state.move(move=a), alpha=alpha, beta=beta, ply=ply + 1)[0] > v:
-                    v = self.minvalue(state=state.move(move=a), alpha=alpha, beta=beta, ply=ply + 1)[0]
+                min_val = self.minvalue(state=state.move(move=a), alpha=alpha, beta=beta, ply=ply + 1)[0]
+                if min_val > v:
+                    v = min_val
                     max_action = a
                 if v >= beta:
                     break
@@ -111,8 +113,9 @@ class AlphaBetaSearch:
         else:
             v = math.inf
             for a in state.get_actions(player=self.minplayer):
-                if self.maxvalue(state=state.move(move=a), alpha=alpha, beta=beta, ply=ply + 1)[0] < v:
-                    v = self.maxvalue(state=state.move(move=a), alpha=alpha, beta=beta, ply=ply + 1)[0]
+                max_val = self.maxvalue(state=state.move(move=a), alpha=alpha, beta=beta, ply=ply + 1)[0]
+                if max_val < v:
+                    v = max_val
                     min_action = a
                 if v <= alpha:
                     break
@@ -134,6 +137,7 @@ class Strategy(abstractstrategy.Strategy):
 
         super(Strategy, self).__init__(*args)
 
+        self.verbose = True
         self.search = AlphaBetaSearch(self, self.maxplayer, self.minplayer, maxplies=self.maxplies, verbose=False)
 
     def play(self, board):
@@ -187,10 +191,10 @@ class Strategy(abstractstrategy.Strategy):
 
         # weight initializer:
         c1 = 10  # diff of kings
-        c2 = 10  # diff of spawns
-        c3 = 2  # number of legal actions. Is one of the players trapped?
+        c2 = 15  # diff of spawns
+        c3 = 3  # number of legal actions. Is one of the players trapped?
         c4 = 2  # diff in number of guards.
-        c5 = 2  # diff in potential soon to become kings.
+        c5 = 4  # diff in potential soon to become kings.
 
         val = c1 * (b_king - r_king) + c2 * (b_spawn - r_spawn) + c3 * (b_len_actions - r_len_actions) + \
               c4 * (black_gaurds - red_gaurds) + c5 * (black_pot_king - red_pot_king)
@@ -206,14 +210,17 @@ class Strategy(abstractstrategy.Strategy):
 # Run test cases if invoked as main module
 if __name__ == "__main__":
     b = boardlibrary.boards["StrategyTest1"]
-    redstrat = Strategy('r', b, 6)
-    blackstrat = Strategy('b', b, 6)
+    c = boardlibrary.boards["multihop"]
+    d = boardlibrary.boards["EndGame1"]
 
-    print(b)
-    (nb, action) = redstrat.play(b)
+    redstrat = Strategy('r', d, 6)
+    blackstrat = Strategy('b', d, 6)
+
+    print(d)
+    (nb, action) = redstrat.play(d)
     print("Red would select ", action)
     print(nb)
 
-    (nb, action) = blackstrat.play(b)
-    print("Black would select ", action)
-    print(nb)
+    # (nb, action) = blackstrat.play(d)
+    # print("Black would select ", action)
+    # print(nb)
