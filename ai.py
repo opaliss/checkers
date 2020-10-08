@@ -10,6 +10,27 @@ Programmer: Opal Issan: Oct, 2020.
 from lib import abstractstrategy, boardlibrary
 import math
 
+"""
+        # TODO - ASK PROFESSOR ROCH THE FOLLOWING:
+        
+        1. does .isterminal() function account for the following rules of a draw:
+        ***
+        At any stage of the game, a player can demonstrate to the satisfaction of the referee that both the following 
+        conditions hold: 
+        Neither player has advanced an uncrowned man towards the king-row during their own previous 40 moves.
+        No pieces have been removed from the board during their own previous 40 moves.
+        ***
+        
+        2. Should we set a timer of the agents?  (I ask this because Timer.py is provided for us and imported
+         in checkers.py). 
+        
+        3. Is it okay to import math in ai.py to use math.inf? 
+        
+        4. If there is a draw, should we check for which player has more players on the board to specify the winner?
+        or should we return winner = None?
+
+"""
+
 
 class AlphaBetaSearch:
 

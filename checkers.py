@@ -39,7 +39,6 @@ if True:
 
 # human - human player, prompts for input
 from lib import human, checkerboard  # , tonto
-import ai
 
 from lib.timer import Timer
 
@@ -65,11 +64,11 @@ def Game(red=human.Strategy, black=tonto.Strategy,
     if verbose:
         print("Initial board\n", board)
 
-    # create instances of strategy.
+    # Create instances of strategy.
     red_player = red('r', checkerboard.CheckerBoard, maxplies)
     black_player = black('b', checkerboard.CheckerBoard, maxplies)
 
-    # initialize the winner - returned 'r' or 'b' or None.
+    # Initialize the winner - returned 'r' or 'b' or None.
     winner = None
 
     ii = 0  # keep track of the number of turns.
@@ -116,7 +115,7 @@ def Game(red=human.Strategy, black=tonto.Strategy,
 
         ii += 1
 
-    # if the winner did not win from cornering the other player,
+    # If the winner did not win from cornering the other player,
     # check if the other player has no players left on the board.
     if winner is None:
         terminal, winner = board.is_terminal()
@@ -126,7 +125,7 @@ def Game(red=human.Strategy, black=tonto.Strategy,
         if winner is not None:
             print("Game is over, winner is = ", winner)
         else:
-            print("Game is over, draw. ")
+            print("Game is over, resulting in a draw.")
 
     return winner
 
@@ -134,7 +133,7 @@ def Game(red=human.Strategy, black=tonto.Strategy,
 if __name__ == "__main__":
     # Examples
     from lib import abstractstrategy, boardlibrary
-
+    import ai
     # Starting from specific board with default strategy
     # Game(init=boardlibrary.boards["multihop"])
     # Game(init=boardlibrary.boards["StrategyTest1"])
