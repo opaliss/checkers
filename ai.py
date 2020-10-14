@@ -8,28 +8,6 @@ Programmer: Opal Issan: Oct, 2020.
 """
 
 from lib import abstractstrategy, boardlibrary
-import math
-
-"""
-        # TODO - ASK PROFESSOR ROCH THE FOLLOWING:
-        
-        1. does .isterminal() function account for the following rules of a draw:
-        ***
-        At any stage of the game, a player can demonstrate to the satisfaction of the referee that both the following 
-        conditions hold: 
-        Neither player has advanced an uncrowned man towards the king-row during their own previous 40 moves.
-        No pieces have been removed from the board during their own previous 40 moves.
-        ***
-        
-        2. Should we set a timer of the agents?  (I ask this because Timer.py is provided for us and imported
-         in checkers.py). 
-        
-        3. Is it okay to import math in ai.py to use math.inf? 
-        
-        4. If there is a draw, should we check for which player has more players on the board to specify the winner?
-        or should we return winner = None?
-
-"""
 
 
 class AlphaBetaSearch:
@@ -60,12 +38,13 @@ class AlphaBetaSearch:
         :param state: Instance of the game representation
         :return: best action for maxplayer
         """
-        v, best_action = self.maxvalue(state=state, alpha=-math.inf, beta=math.inf, ply=0)
-        return best_action
 
-    def cutoff(self, state, ply):
+        return self.maxvalue(state=state, alpha=-float("inf"), beta=float("inf"), ply=1)[1]
+
+    def cutoff(self, state, ply, player):
         """
         cutoff_test - Should the search stop?
+        :param player: max or min player.
         :param state: current game state
         :param ply: current ply (depth) in search tree
         :return: True if search is to be stopped (terminal state or cutoff
@@ -77,7 +56,7 @@ class AlphaBetaSearch:
         terminal, winner = state.is_terminal()
 
         # if the search depth is greater than maxplies, than stop search.
-        if ply > self.maxplies:
+        if ply >= self.maxplies:
             return True
 
         # if the game is over return stop search.
@@ -85,7 +64,7 @@ class AlphaBetaSearch:
             return True
 
         # if the max player can not move, stop search.
-        elif len(state.get_actions(player=self.maxplayer)) == 0:
+        elif len(state.get_actions(player=player)) == 0:
             return True
 
         # otherwise, return continue to search.
@@ -102,11 +81,18 @@ class AlphaBetaSearch:
         :param ply: current search depth
         :return: (value, maxaction)
         """
+        # the optimal action for the max player.
         max_action = None
-        if self.cutoff(state=state, ply=ply) is True:
+
+        # if terminal state then return the utility of current state.
+        if self.cutoff(state=state, ply=ply, player=self.maxplayer):
             v = self.strategy.evaluate(state=state)
+            if self.verbose:
+                print("v = ", v)
+                print("max_action = ", max_action)
         else:
-            v = -math.inf
+            v = -float("inf")
+            # iterate through the possible actions for max_player in current state.
             for a in state.get_actions(player=self.maxplayer):
                 min_val = self.minvalue(state=state.move(move=a), alpha=alpha, beta=beta, ply=ply + 1)[0]
                 if min_val > v:
@@ -116,6 +102,7 @@ class AlphaBetaSearch:
                     break
                 else:
                     alpha = max(alpha, v)
+
         return v, max_action
 
     def minvalue(self, state, alpha, beta, ply):
@@ -128,11 +115,18 @@ class AlphaBetaSearch:
         :return: (v, minaction)  Value of min action and the action that
            produced it.
         """
+        # the opponent's optimal action.
         min_action = None
-        if self.cutoff(state=state, ply=ply):
+
+        # if terminal state then return the utility at the current state.
+        if self.cutoff(state=state, ply=ply, player=self.minplayer):
             v = self.strategy.evaluate(state=state)
+            if self.verbose:
+                print("v = ", v)
+                print("min_action = ", min_action)
         else:
-            v = math.inf
+            v = float("inf")
+            # loop over the legal actions of min player.
             for a in state.get_actions(player=self.minplayer):
                 max_val = self.maxvalue(state=state.move(move=a), alpha=alpha, beta=beta, ply=ply + 1)[0]
                 if max_val < v:

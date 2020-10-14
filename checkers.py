@@ -44,7 +44,7 @@ from lib.timer import Timer
 
 
 def Game(red=human.Strategy, black=tonto.Strategy,
-         maxplies=6, init=None, verbose=True, firstmove=0):
+         maxplies=10, init=None, verbose=True, firstmove=0):
     """Game(red, black, maxplies, init, verbose, turn)
     Start a game of checkers
     red,black - Strategy classes (not instances)
@@ -143,4 +143,5 @@ if __name__ == "__main__":
     # Game(red=tonto.Strategy, black=tonto.Strategy)
 
     # Example using AI agent vs AI agent.
-    Game(red=ai.Strategy, black=ai.Strategy, maxplies=6, verbose=True, init=boardlibrary.boards["multihop"])
+    Game(red=ai.Strategy, black=human.Strategy, maxplies=3, verbose=True)
+
