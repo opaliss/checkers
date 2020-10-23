@@ -143,5 +143,5 @@ if __name__ == "__main__":
     # Game(red=tonto.Strategy, black=tonto.Strategy)
 
     # Example using AI agent vs AI agent.
-    Game(red=ai.Strategy, black=human.Strategy, maxplies=3, verbose=True)
+    Game(red=ai.Strategy, black=tonto.Strategy, maxplies=6, verbose=True)
 
